@@ -11,6 +11,7 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
 )
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
@@ -18,6 +19,15 @@ from .coordinator import OntConfigEntry
 from .entity import OntEntity
 
 PARALLEL_UPDATES = 0
+
+
+def _tcont_linked(data: dict[str, Any]) -> bool | None:
+    allocs, gems = data.get("allocations"), data.get("gem_ports")
+    if not allocs and not gems:
+        return None
+    return all(a["status"] == "LINKED" for a in allocs or []) and all(
+        g["alloc_state"] == "Valid" for g in gems or []
+    )
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -54,6 +64,34 @@ BINARY_SENSORS: tuple[OntBinarySensorDescription, ...] = (
             "receiver_status": d.get("receiver_status"),
             "transmitter_status": d.get("transmitter_status"),
         },
+    ),
+    OntBinarySensorDescription(
+        key="tcont_linked",
+        translation_key="tcont_linked",
+        device_class=BinarySensorDeviceClass.CONNECTIVITY,
+        is_on_fn=_tcont_linked,
+        attrs_fn=lambda d: {
+            "allocations": d.get("allocations") or [],
+            "gem_ports": d.get("gem_ports") or [],
+        },
+    ),
+    OntBinarySensorDescription(
+        key="dying_gasp",
+        translation_key="dying_gasp",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        is_on_fn=lambda d: d.get("dying_gasp"),
+    ),
+    OntBinarySensorDescription(
+        key="rx_los",
+        translation_key="rx_los",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        is_on_fn=lambda d: d.get("rx_los"),
+    ),
+    OntBinarySensorDescription(
+        key="ping_daemon",
+        translation_key="ping_daemon",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        is_on_fn=lambda d: d.get("ping_daemon"),
     ),
 )
 

@@ -38,6 +38,7 @@ class OntSensorDescription(SensorEntityDescription):
     """Describes an ONT sensor."""
 
     value_fn: Callable[[dict[str, Any]], Any] | None = None
+    attrs_fn: Callable[[dict[str, Any]], dict[str, Any]] | None = None
 
 
 def _counter(key: str, **kwargs: Any) -> OntSensorDescription:
@@ -58,6 +59,12 @@ def _temperature(key: str, **kwargs: Any) -> OntSensorDescription:
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         **kwargs,
+    )
+
+
+def _diagnostic(key: str, **kwargs: Any) -> OntSensorDescription:
+    return OntSensorDescription(
+        key=key, translation_key=key, entity_category=EntityCategory.DIAGNOSTIC, **kwargs
     )
 
 
@@ -110,6 +117,7 @@ SENSORS: tuple[OntSensorDescription, ...] = (
     OntSensorDescription(
         key="ploam_state",
         translation_key="ploam_state",
+        attrs_fn=lambda d: {"description": d.get("ploam_state_description")},
     ),
     OntSensorDescription(
         key="pon_mode",
@@ -170,6 +178,48 @@ SENSORS: tuple[OntSensorDescription, ...] = (
     _counter("fs_hec_errors_uncorrected", entity_registry_enabled_default=False),
     _counter("hec_lost_words", entity_registry_enabled_default=False),
     _counter("ploam_mic_errors", entity_registry_enabled_default=False),
+    _counter("ploam_onu_id_assignments"),
+    _counter("ploam_ranging"),
+    _counter("ploam_deactivations"),
+    OntSensorDescription(
+        key="queue_drops",
+        translation_key="queue_drops",
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        attrs_fn=lambda d: {
+            "queues": [
+                q for q in d.get("queues") or [] if q["wred_drops"] or q["codel_drops"]
+            ]
+        },
+    ),
+    _diagnostic(
+        "olt_tol",
+        device_class=SensorDeviceClass.SIGNAL_STRENGTH,
+        native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
+    ),
+    _diagnostic("odn_class"),
+    _diagnostic("pon_id"),
+    _diagnostic(
+        "pon_ip_fw_version",
+        attrs_fn=lambda d: {
+            "hw_version": d.get("pon_ip_hw_version"),
+            "sw_version": d.get("pon_ip_sw_version"),
+            "pontop_version": d.get("pontop_version"),
+        },
+    ),
+    _diagnostic(
+        "inactive_firmware",
+        attrs_fn=lambda d: {
+            "bank": d.get("inactive_firmware_bank"),
+            "revision": d.get("inactive_firmware_revision"),
+            "variant": d.get("inactive_firmware_variant"),
+        },
+    ),
+    _diagnostic("pon_serial_number"),
+    _diagnostic("vendor_id"),
+    _diagnostic("equipment_id"),
+    _diagnostic("fix_vlans"),
+    _diagnostic("iphost_mac"),
+    _diagnostic("lct_mac"),
     OntSensorDescription(
         key="boot_time",
         translation_key="boot_time",
@@ -227,6 +277,6 @@ class OntSensor(OntEntity, SensorEntity):
     @property
     def extra_state_attributes(self) -> dict[str, Any] | None:
         """Return extra attributes."""
-        if self.entity_description.key == "ploam_state":
-            return {"description": self.coordinator.data.get("ploam_state_description")}
+        if self.entity_description.attrs_fn:
+            return self.entity_description.attrs_fn(self.coordinator.data)
         return None

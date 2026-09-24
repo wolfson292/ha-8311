@@ -54,6 +54,15 @@ Host and credentials can be changed later with **Reconfigure**.
 | BIP errors, FEC corrected/uncorrected codewords, FEC errored seconds | Error counters. |
 | HEC / PLOAM MIC error counters | Disabled by default. |
 | PON mode, Ethernet link speed, active firmware bank, last boot, memory usage, load | Diagnostic. |
+| ONU ID assignments, ranging events, deactivations | PLOAM message counters. If they go up, the OLT re-ranged or dropped the ONT. |
+| QoS queue drops | WRED + CoDel drops across the PPv4 QoS queues; queues with drops are listed in the `queues` attribute. |
+| T-CONT link (binary) | On when every T-CONT allocation is `LINKED` and every GEM port is `Valid`; allocations and GEM ports are listed in attributes. |
+| OLT transmit optical level, ODN class, PON ID | Values reported by the OLT. Diagnostic. |
+| PON chip firmware | PON IP firmware version, with HW/SW/pontop versions as attributes. Diagnostic. |
+| Inactive bank firmware | Version of the firmware in the other bank, with revision and variant. Diagnostic. |
+| PON serial number, vendor ID, equipment ID | Identity the ONT presents to the OLT (as set on the 8311 config page). Diagnostic; the serial is redacted from diagnostics downloads. |
+| Fix VLANs, dying gasp / RX LOS / ping daemon enabled | 8311 configuration settings. Diagnostic. |
+| IP host MAC, LCT MAC | Diagnostic; redacted from diagnostics downloads. |
 | Restart (button) | Reboots the ONT. **This drops your internet connection** until it re-ranges. |
 
 ## How it works
@@ -64,7 +73,11 @@ The integration uses the same endpoints as the 8311 LuCI pages:
 - `admin/8311/pontop/<page>` for optical, FEC, GTC, alarm and GEM counters
 - the `ubus` JSON-RPC API (with the LuCI session) for uptime, memory and load
 
-Each poll makes 7 small HTTPS requests to the ONT.
+Each LuCI page costs the ONT roughly half a second of CPU (the configuration page about
+six), and LuCI serves them one at a time. So only optical levels, FEC/GTC counters,
+alarms, traffic and system stats are polled every interval (7 requests, ~4 s of ONT time).
+PLOAM counters, queue drops, T-CONT/GEM state, OLT parameters, firmware banks and
+configuration are refreshed every 5 minutes.
 
 ## Development
 

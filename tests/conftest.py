@@ -36,7 +36,12 @@ async def _pontop(self, page: str) -> str:
 
 
 async def _get_text(self, path: str) -> str:
-    return load("footer.html")
+    return load(
+        {
+            "admin/8311/firmware": "firmware.html",
+            "admin/8311/config": "config.html",
+        }.get(path, "footer.html")
+    )
 
 
 async def _get_json(self, path: str) -> dict:

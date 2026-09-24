@@ -59,38 +59,155 @@
   },
   "entity": {
     "binary_sensor": {
-      "pon_link": { "name": "PON link" },
-      "alarm": { "name": "Alarm" },
-      "receiver_problem": { "name": "Optical receiver" }
+      "pon_link": {
+        "name": "PON link"
+      },
+      "alarm": {
+        "name": "Alarm"
+      },
+      "receiver_problem": {
+        "name": "Optical receiver"
+      },
+      "tcont_linked": {
+        "name": "T-CONT link"
+      },
+      "dying_gasp": {
+        "name": "Dying gasp enabled"
+      },
+      "rx_los": {
+        "name": "RX loss of signal enabled"
+      },
+      "ping_daemon": {
+        "name": "Ping daemon enabled"
+      }
     },
     "sensor": {
-      "rx_power": { "name": "RX power" },
-      "tx_power": { "name": "TX power" },
-      "tx_bias": { "name": "TX bias current" },
-      "voltage": { "name": "Supply voltage" },
-      "optic_temperature": { "name": "Optic temperature" },
-      "cpu1_temperature": { "name": "CPU 1 temperature" },
-      "cpu2_temperature": { "name": "CPU 2 temperature" },
-      "ploam_state": { "name": "PLOAM state" },
-      "pon_mode": { "name": "PON mode" },
-      "eth_speed": { "name": "Ethernet link speed" },
-      "active_bank": { "name": "Active firmware bank" },
-      "downstream_throughput": { "name": "Downstream throughput" },
-      "upstream_throughput": { "name": "Upstream throughput" },
-      "downstream_bytes": { "name": "Downstream data" },
-      "upstream_bytes": { "name": "Upstream data" },
-      "bip_errors": { "name": "BIP errors" },
-      "fec_codewords_corrected": { "name": "FEC corrected codewords" },
-      "fec_codewords_uncorrected": { "name": "FEC uncorrected codewords" },
-      "fec_errored_seconds": { "name": "FEC errored seconds" },
-      "psbd_hec_errors_uncorrected": { "name": "PSBd HEC uncorrected errors" },
-      "fs_hec_errors_uncorrected": { "name": "FS HEC uncorrected errors" },
-      "hec_lost_words": { "name": "HEC lost words" },
-      "ploam_mic_errors": { "name": "PLOAM MIC errors" },
-      "boot_time": { "name": "Last boot" },
-      "memory_usage": { "name": "Memory usage" },
-      "load_1m": { "name": "Load (1m)" },
-      "load_5m": { "name": "Load (5m)" }
+      "rx_power": {
+        "name": "RX power"
+      },
+      "tx_power": {
+        "name": "TX power"
+      },
+      "tx_bias": {
+        "name": "TX bias current"
+      },
+      "voltage": {
+        "name": "Supply voltage"
+      },
+      "optic_temperature": {
+        "name": "Optic temperature"
+      },
+      "cpu1_temperature": {
+        "name": "CPU 1 temperature"
+      },
+      "cpu2_temperature": {
+        "name": "CPU 2 temperature"
+      },
+      "ploam_state": {
+        "name": "PLOAM state"
+      },
+      "pon_mode": {
+        "name": "PON mode"
+      },
+      "eth_speed": {
+        "name": "Ethernet link speed"
+      },
+      "active_bank": {
+        "name": "Active firmware bank"
+      },
+      "downstream_throughput": {
+        "name": "Downstream throughput"
+      },
+      "upstream_throughput": {
+        "name": "Upstream throughput"
+      },
+      "downstream_bytes": {
+        "name": "Downstream data"
+      },
+      "upstream_bytes": {
+        "name": "Upstream data"
+      },
+      "bip_errors": {
+        "name": "BIP errors"
+      },
+      "fec_codewords_corrected": {
+        "name": "FEC corrected codewords"
+      },
+      "fec_codewords_uncorrected": {
+        "name": "FEC uncorrected codewords"
+      },
+      "fec_errored_seconds": {
+        "name": "FEC errored seconds"
+      },
+      "psbd_hec_errors_uncorrected": {
+        "name": "PSBd HEC uncorrected errors"
+      },
+      "fs_hec_errors_uncorrected": {
+        "name": "FS HEC uncorrected errors"
+      },
+      "hec_lost_words": {
+        "name": "HEC lost words"
+      },
+      "ploam_mic_errors": {
+        "name": "PLOAM MIC errors"
+      },
+      "boot_time": {
+        "name": "Last boot"
+      },
+      "memory_usage": {
+        "name": "Memory usage"
+      },
+      "load_1m": {
+        "name": "Load (1m)"
+      },
+      "load_5m": {
+        "name": "Load (5m)"
+      },
+      "ploam_onu_id_assignments": {
+        "name": "ONU ID assignments"
+      },
+      "ploam_ranging": {
+        "name": "Ranging events"
+      },
+      "ploam_deactivations": {
+        "name": "Deactivations"
+      },
+      "queue_drops": {
+        "name": "QoS queue drops"
+      },
+      "olt_tol": {
+        "name": "OLT transmit optical level"
+      },
+      "odn_class": {
+        "name": "ODN class"
+      },
+      "pon_id": {
+        "name": "PON ID"
+      },
+      "pon_ip_fw_version": {
+        "name": "PON chip firmware"
+      },
+      "inactive_firmware": {
+        "name": "Inactive bank firmware"
+      },
+      "pon_serial_number": {
+        "name": "PON serial number"
+      },
+      "vendor_id": {
+        "name": "Vendor ID"
+      },
+      "equipment_id": {
+        "name": "Equipment ID"
+      },
+      "fix_vlans": {
+        "name": "Fix VLANs"
+      },
+      "iphost_mac": {
+        "name": "IP host MAC"
+      },
+      "lct_mac": {
+        "name": "LCT MAC"
+      }
     }
   }
 }

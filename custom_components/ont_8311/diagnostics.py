@@ -11,7 +11,13 @@ from homeassistant.core import HomeAssistant
 
 from .coordinator import OntConfigEntry
 
-TO_REDACT = {CONF_PASSWORD, "serial_number"}
+TO_REDACT = {
+    CONF_PASSWORD,
+    "serial_number",
+    "pon_serial_number",
+    "iphost_mac",
+    "lct_mac",
+}
 
 
 async def async_get_config_entry_diagnostics(

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
+import html
 import logging
 import re
 from typing import Any
@@ -14,8 +15,12 @@ _LOGGER = logging.getLogger(__name__)
 
 REQUEST_TIMEOUT = aiohttp.ClientTimeout(total=20)
 
-# pontop pages polled on every update
+# pontop pages polled on every update. Each costs ~0.5s of ONT CPU and LuCI
+# serves them one at a time, so keep this list short.
 PONTOP_PAGES = ("optical", "fec", "gtc", "alarms", "gem_stats")
+
+# pontop pages refreshed on the slow cycle
+SLOW_PONTOP_PAGES = ("status", "ploam_ds", "pp4_stats", "alloc_stats", "gem")
 
 _KV_RE = re.compile(r"^\s*(?P<key>[^:]+?)\s*:\s*(?P<value>.*?)\s*$")
 _NUM_RE = re.compile(r"-?\d+(?:\.\d+)?")
@@ -104,6 +109,99 @@ def parse_alarms(text: str) -> list[dict[str, str]]:
         else:
             alarms.append({"type": "", "alarm": line.strip(), "description": ""})
     return alarms
+
+
+def parse_queue_stats(text: str) -> list[dict[str, Any]]:
+    """Parse the PPv4 queue stats table (``| 61 (303)-rlm-29 | 0 | 2228553228 | 1756 | 0 |``)."""
+    queues = []
+    for line in text.splitlines():
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if len(cells) != 5 or not cells[0][:1].isdigit():
+            continue
+        try:
+            forward, wred, codel = (int(cells[i]) for i in (2, 3, 4))
+        except ValueError:
+            continue
+        queues.append(
+            {"queue": " ".join(cells[0].split()), "forwarded": forward, "wred_drops": wred, "codel_drops": codel}
+        )
+    return queues
+
+
+def parse_allocations(text: str) -> list[dict[str, Any]]:
+    """Parse the T-CONT allocation table."""
+    allocs = []
+    for row in parse_table(text):
+        if len(row) >= 6 and row[0].isdigit():
+            allocs.append({"alloc_id": int(row[1]), "status": row[-1]})
+    return allocs
+
+
+def parse_gem_ports(text: str) -> list[dict[str, Any]]:
+    """Parse the GEM port status table.
+
+    The header columns don't line up with the data, so parse by token position:
+    ``1  2306  1026  Valid  Ethernet  2048  None  DS + US``
+    """
+    gems = []
+    for row in parse_table(text):
+        if len(row) >= 7 and row[0].isdigit():
+            gems.append(
+                {
+                    "gem_id": int(row[1]),
+                    "alloc_id": int(row[2]) if row[2].isdigit() else row[2],
+                    "alloc_state": row[3],
+                    "type": row[4],
+                    "encryption": row[6],
+                    "direction": " ".join(row[7:]) or None,
+                }
+            )
+    return gems
+
+
+def parse_firmware_banks(page: str) -> dict[str, dict[str, str]]:
+    """Parse the Firmware page into ``{"active": {...}, "inactive": {...}}``."""
+    banks: dict[str, dict[str, str]] = {}
+    sections = re.split(r"<h3>\s*(Active|Inactive) Firmware \((\w+)\)\s*</h3>", page)
+    for kind, bank, body in zip(sections[1::3], sections[2::3], sections[3::3], strict=True):
+        cells = [
+            html.unescape(c).strip() for c in re.findall(r'<div class="td[^"]*"[^>]*>(.*?)</div>', body)
+        ]
+        info = {"bank": bank}
+        info.update(
+            {k.lower(): v for k, v in zip(cells[::2], cells[1::2], strict=False) if k}
+        )
+        banks[kind.lower()] = info
+    return banks
+
+
+def parse_config_form(page: str) -> dict[str, Any]:
+    """Parse the 8311 Configuration form into ``{field_name: effective value}``.
+
+    Empty text fields fall back to their placeholder, which is the default the
+    firmware uses. Checkboxes become bools and selects their option label.
+    """
+    fields: dict[str, Any] = {}
+    parts = re.split(r'data-name="([^"]+)"', page)
+    for name, body in zip(parts[1::2], parts[2::2], strict=True):
+        body = re.split(r'<div class="cbi-value[ "]', body, maxsplit=1)[0]
+        control = re.search(r"<(input|select)([^>]*)>", body)
+        if not control:
+            continue
+        attrs = control.group(2)
+        if control.group(1) == "select":
+            selected = re.search(r"<option[^>]*selected[^>]*>([^<]*)", body)
+            value = html.unescape(selected.group(1)).strip() if selected else None
+            fields[name] = value or None
+        elif 'type="checkbox"' in attrs:
+            fields[name] = "checked" in attrs
+        else:
+            value = re.search(r'value="([^"]*)"', attrs)
+            placeholder = re.search(r'placeholder="([^"]*)"', attrs)
+            fields[name] = html.unescape(
+                (value.group(1) if value else "") or (placeholder.group(1) if placeholder else "")
+            ) or None
+    return fields
 
 
 def parse_temperatures(value: str | None) -> list[float | None]:
@@ -351,6 +449,52 @@ class OntClient:
             else None,
             "load_1m": round(load[0] / 65536, 2) if load else None,
             "load_5m": round(load[1] / 65536, 2) if len(load) > 1 else None,
+        }
+
+    async def get_slow_data(self) -> dict[str, Any]:
+        """Fetch data that changes rarely or is expensive for the ONT to produce."""
+        results = await asyncio.gather(
+            *(self.pontop(page) for page in SLOW_PONTOP_PAGES),
+            self.get_text("admin/8311/firmware"),
+            self.get_text("admin/8311/config"),
+        )
+        pages = dict(zip(SLOW_PONTOP_PAGES, results[:-2], strict=True))
+        status = parse_key_values(pages["status"])
+        ploam_ds = parse_key_values(pages["ploam_ds"])
+        queues = parse_queue_stats(pages["pp4_stats"])
+        banks = parse_firmware_banks(results[-2])
+        config = parse_config_form(results[-1])
+        inactive = banks.get("inactive", {})
+        return {
+            "ploam_onu_id_assignments": parse_int(ploam_ds.get("Assign ONU ID")),
+            "ploam_ranging": parse_int(ploam_ds.get("Ranging time")),
+            "ploam_deactivations": parse_int(ploam_ds.get("Deactivate ONU ID")),
+            "queue_drops": sum(q["wred_drops"] + q["codel_drops"] for q in queues)
+            if queues
+            else None,
+            "queues": queues,
+            "allocations": parse_allocations(pages["alloc_stats"]),
+            "gem_ports": parse_gem_ports(pages["gem"]),
+            "olt_tol": parse_float(status.get("TOL")),
+            "odn_class": status.get("ODN Class"),
+            "pon_id": status.get("PON ID"),
+            "pon_ip_hw_version": status.get("PON IP HW version"),
+            "pon_ip_fw_version": status.get("PON IP FW version"),
+            "pon_ip_sw_version": status.get("PON IP SW version"),
+            "pontop_version": status.get("PON IP pontop version"),
+            "inactive_firmware": inactive.get("version"),
+            "inactive_firmware_bank": inactive.get("bank"),
+            "inactive_firmware_revision": inactive.get("revision"),
+            "inactive_firmware_variant": inactive.get("variant"),
+            "pon_serial_number": config.get("gpon_sn"),
+            "vendor_id": config.get("vendor_id"),
+            "equipment_id": config.get("equipment_id"),
+            "fix_vlans": config.get("fix_vlans"),
+            "dying_gasp": config.get("dying_gasp_en"),
+            "rx_los": config.get("rx_los"),
+            "ping_daemon": config.get("pingd"),
+            "iphost_mac": config.get("iphost_mac"),
+            "lct_mac": config.get("lct_mac"),
         }
 
     async def reboot(self) -> None:

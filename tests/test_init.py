@@ -40,6 +40,16 @@ async def test_user_flow_and_setup(hass: HomeAssistant, mock_ont) -> None:
     assert hass.states.get("binary_sensor.prx126_sfp_pon_alarm").state == "off"
     assert hass.states.get("binary_sensor.prx126_sfp_pon_optical_receiver").state == "off"
     assert hass.states.get("button.prx126_sfp_pon_restart") is not None
+    assert hass.states.get("binary_sensor.prx126_sfp_pon_t_cont_link").state == "on"
+    assert hass.states.get("binary_sensor.prx126_sfp_pon_dying_gasp_enabled").state == "off"
+    assert hass.states.get("binary_sensor.prx126_sfp_pon_ping_daemon_enabled").state == "on"
+    assert hass.states.get("sensor.prx126_sfp_pon_ranging_events").state == "2"
+    assert hass.states.get("sensor.prx126_sfp_pon_qos_queue_drops").state == "1756"
+    assert hass.states.get("sensor.prx126_sfp_pon_odn_class").state == "N1"
+    assert hass.states.get("sensor.prx126_sfp_pon_inactive_bank_firmware").state == "v2.8.3"
+    assert hass.states.get("sensor.prx126_sfp_pon_pon_serial_number").state == "TEST00000001"
+    assert hass.states.get("sensor.prx126_sfp_pon_fix_vlans").state == "Enabled"
+    assert hass.states.get("sensor.prx126_sfp_pon_lct_mac").state == "02:00:00:00:00:02"
 
     # Same ONT again is rejected
     result = await _create_entry(hass)

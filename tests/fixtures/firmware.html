@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>prx126-sfp-pon - Firmware - LuCI</title>
+		<meta name="viewport" content="initial-scale=1.0">
+		<link rel="stylesheet" href="/luci-static/bootstrap/cascade.css?v=git-22.045.73925-36e5c1c">
+		<link rel="stylesheet" media="only screen and (max-device-width: 854px)" href="/luci-static/bootstrap/mobile.css?v=git-22.045.73925-36e5c1c" type="text/css" />
+		<link rel="shortcut icon" href="/luci-static/bootstrap/favicon.png">
+		<script src="/cgi-bin/luci/admin/translations/en?v=git-22.045.73925-36e5c1c"></script>
+		<script src="/luci-static/resources/cbi.js?v=git-22.045.73925-36e5c1c"></script>
+	</head>
+
+	<body class="lang_en Firmware" data-page="admin-8311-firmware">
+		<header>
+			<div class="fill">
+				<div class="container">
+					<a class="brand" href="#">prx126-sfp-pon</a>
+					<ul class="nav" id="topmenu" style="display:none"></ul>
+					<div id="indicators" class="pull-right"></div>
+				</div>
+			</div>
+		</header>
+
+		<div id="maincontent" class="container"><div class="alert-message warning">
+					<h4>No password set!</h4>
+					<p>There is no password set on this router. Please configure a root password to protect the web interface.</p>
+					
+				</div><noscript>
+				<div class="alert-message warning">
+					<h4>JavaScript required!</h4>
+					<p>You must enable JavaScript in your browser or LuCI will not work properly.</p>
+				</div>
+			</noscript>
+
+			<div id="tabmenu" style="display:none"></div>
+
+
+<script type="text/javascript" src="/luci-static/resources/promis.min.js?v=git-22.045.73925-36e5c1c"></script>
+<script type="text/javascript" src="/luci-static/resources/luci.js?v=git-22.045.73925-36e5c1c"></script>
+<script type="text/javascript">
+	L = new LuCI({"apply_rollback":90,"resource":"\/luci-static\/resources","media":"\/luci-static\/bootstrap","apply_holdoff":4,"pathinfo":"\/admin\/8311\/firmware","apply_display":1.5,"requestpath":["admin","8311","firmware"],"ubuspath":"\/ubus\/","scriptname":"\/cgi-bin\/luci","dispatchpath":["admin","8311","firmware"],"sessionid":"00000000000000000000000000000000","token":"00000000000000000000000000000000","apply_timeout":5,"nodespec":{"order":6,"satisfied":true,"title":"Firmware","action":{"module":"luci.controller.8311","type":"call","function":"action_firmware","parameters":[]}},"pollinterval":5});
+</script>
+
+<link rel="stylesheet" href="/luci-static/resources/view/8311.css" />
+<script type="text/javascript" src="/luci-static/resources/jquery-3.7.1.min.js"></script>
+<script type="text/javascript" src="/luci-static/resources/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/luci-static/resources/view/8311.js"></script>
+
+<h2 name="content">Firmware</h2>
+<br />
+
+<div class="cbi-section fade-in" style="">
+	<h3>Active Firmware (A)</h3>
+	<div>
+		<div class="table">
+			<div class="tr">
+				<div class="td left" width="33%">Version</div>
+				<div class="td left">v2.8.3</div>
+			</div>
+			<div class="tr">
+				<div class="td left">Revision</div>
+				<div class="td left">7d89440</div>
+			</div>
+			<div class="tr">
+				<div class="td left">Variant</div>
+				<div class="td left">basic</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="cbi-section fade-in" style="">
+	<h3>Inactive Firmware (B)</h3>
+	<div>
+		<div class="table">
+			<div class="tr">
+				<div class="td left" width="33%">Version</div>
+				<div class="td left">v2.8.3</div>
+			</div>
+			<div class="tr">
+				<div class="td left">Revision</div>
+				<div class="td left">7d89440</div>
+			</div>
+			<div class="tr">
+				<div class="td left">Variant</div>
+				<div class="td left">basic</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="cbi-value" id="switch-reboot-section">
+		<div id="switch-reboot-original" style="display: flex; align-items: center;">
+			<button class="cbi-button cbi-button-action" type="button" onclick="showSwitchRebootConfirmation();" style="margin-left: 10px;">Switch and Reboot</button>
+		</div>
+		<div id="switch-reboot-confirmation" style="display:none; align-items: center;">
+			<span>Switch to inactive bank B?</span>
+			<button class="cbi-button cbi-button-action important" type="button" onclick="confirmSwitchReboot(true, this);" style="margin-left: 10px;">Confirm and Reboot</button>
+			<button class="cbi-button cbi-button-reset" type="button" onclick="confirmSwitchReboot(false, this);" style="margin-left: 5px;">Cancel</button>
+		</div>
+	</div>
+	
+</div>
+
+<div class="cbi-section fade-in">
+	<h3>Firmware Upgrade</h3>
+
+	<form id="firmware-form" method="post" action="/cgi-bin/luci/admin/8311/firmware" enctype="multipart/form-data">
+		<div id="zone-content-wrapper">
+			<div id="zone-content">
+
+				<div class="cbi-value">
+					<button type="button" class="firmware-button cbi-button cbi-button-neutral important" onclick="$('#firmware-file').click();">Browse</button>
+					<input type="file" name="firmware_file" id="firmware-file" required="required" />
+					<div class="upload-description">
+						Upload firmware file here, typically named local-upgrade.tar
+					</div>
+				</div>
+
+
+			</div>
+		</div>
+
+		<button class="firmware-button cbi-button cbi-button-action" title="Upload firmware" onclick="return uploadFirmware(this);">Upload</button>
+
+
+
+
+		<input id="firmware-action" type="hidden" name="action" value="validate" />
+	</form>
+
+
+</div>
+
+
+
+
+
+   <footer>
+    <div style="margin: auto; text-align: center">
+      <a href="https://github.com/openwrt/luci">Powered by LuCI openwrt-19.07 branch (git-22.045.73925-36e5c1c)</a> / LEDE PTXG_CX_V0.03 r11364-ef56c85848 v19.07.8_maxlinear<br />
+
+      <a href="https://github.com/djGrrr/8311-was-110-firmware-builder">8311 Community Firmware MOD</a> by <a href="https://github.com/djGrrr">djGrrr</a> -
+      [basic] - v2.8.3 (7d89440) - <a href="https://discord.com/servers/8311-886329492438671420">8311 Community Discord Server</a>
+      
+    </div>
+    <div style="margin-top: 10px">
+      <a href="https://discord.com/servers/8311-886329492438671420"><img src="/luci-static/resources/logo_8311.png" alt="8311 Logo" style="display: block; margin-left: auto; margin-right: auto;" /></a>
+    </div>
+   <ul class="breadcrumb pull-right" id="modemenu" style="display:none"></ul>
+   </footer>
+  </div>
+  
+  <script type="text/javascript">L.require('menu-bootstrap')</script>
+  
+ </body>
+</html>
+
+
+

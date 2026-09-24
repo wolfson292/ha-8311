@@ -1,24 +1,116 @@
 {
   "entity": {
     "binary_sensor": {
-      "pon_link": { "default": "mdi:wan" },
-      "receiver_problem": { "default": "mdi:eye-check", "state": { "on": "mdi:eye-off" } }
+      "pon_link": {
+        "default": "mdi:wan"
+      },
+      "receiver_problem": {
+        "default": "mdi:eye-check",
+        "state": {
+          "on": "mdi:eye-off"
+        }
+      },
+      "tcont_linked": {
+        "default": "mdi:lan-connect",
+        "state": {
+          "off": "mdi:lan-disconnect"
+        }
+      },
+      "dying_gasp": {
+        "default": "mdi:power-plug-off-outline"
+      },
+      "rx_los": {
+        "default": "mdi:signal-off"
+      },
+      "ping_daemon": {
+        "default": "mdi:access-point-network"
+      }
     },
     "sensor": {
-      "ploam_state": { "default": "mdi:state-machine" },
-      "pon_mode": { "default": "mdi:fiber" },
-      "active_bank": { "default": "mdi:chip" },
-      "downstream_throughput": { "default": "mdi:download-network" },
-      "upstream_throughput": { "default": "mdi:upload-network" },
-      "downstream_bytes": { "default": "mdi:download" },
-      "upstream_bytes": { "default": "mdi:upload" },
-      "bip_errors": { "default": "mdi:alert-circle-outline" },
-      "fec_codewords_corrected": { "default": "mdi:check-decagram-outline" },
-      "fec_codewords_uncorrected": { "default": "mdi:alert-decagram-outline" },
-      "fec_errored_seconds": { "default": "mdi:timer-alert-outline" },
-      "memory_usage": { "default": "mdi:memory" },
-      "load_1m": { "default": "mdi:gauge" },
-      "load_5m": { "default": "mdi:gauge" }
+      "ploam_state": {
+        "default": "mdi:state-machine"
+      },
+      "pon_mode": {
+        "default": "mdi:fiber"
+      },
+      "active_bank": {
+        "default": "mdi:chip"
+      },
+      "downstream_throughput": {
+        "default": "mdi:download-network"
+      },
+      "upstream_throughput": {
+        "default": "mdi:upload-network"
+      },
+      "downstream_bytes": {
+        "default": "mdi:download"
+      },
+      "upstream_bytes": {
+        "default": "mdi:upload"
+      },
+      "bip_errors": {
+        "default": "mdi:alert-circle-outline"
+      },
+      "fec_codewords_corrected": {
+        "default": "mdi:check-decagram-outline"
+      },
+      "fec_codewords_uncorrected": {
+        "default": "mdi:alert-decagram-outline"
+      },
+      "fec_errored_seconds": {
+        "default": "mdi:timer-alert-outline"
+      },
+      "memory_usage": {
+        "default": "mdi:memory"
+      },
+      "load_1m": {
+        "default": "mdi:gauge"
+      },
+      "load_5m": {
+        "default": "mdi:gauge"
+      },
+      "ploam_onu_id_assignments": {
+        "default": "mdi:identifier"
+      },
+      "ploam_ranging": {
+        "default": "mdi:ruler"
+      },
+      "ploam_deactivations": {
+        "default": "mdi:link-off"
+      },
+      "queue_drops": {
+        "default": "mdi:tray-remove"
+      },
+      "odn_class": {
+        "default": "mdi:fiber"
+      },
+      "pon_id": {
+        "default": "mdi:identifier"
+      },
+      "pon_ip_fw_version": {
+        "default": "mdi:chip"
+      },
+      "inactive_firmware": {
+        "default": "mdi:package-variant"
+      },
+      "pon_serial_number": {
+        "default": "mdi:barcode"
+      },
+      "vendor_id": {
+        "default": "mdi:domain"
+      },
+      "equipment_id": {
+        "default": "mdi:card-text-outline"
+      },
+      "fix_vlans": {
+        "default": "mdi:wrench-outline"
+      },
+      "iphost_mac": {
+        "default": "mdi:ethernet"
+      },
+      "lct_mac": {
+        "default": "mdi:ethernet"
+      }
     }
   }
 }

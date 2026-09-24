@@ -18,6 +18,10 @@ from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
+# Counters, T-CONT state, config and firmware info are refreshed less often
+# because every page is slow for the ONT to render (the config page takes ~6s)
+SLOW_UPDATE_INTERVAL = 300
+
 type OntConfigEntry = ConfigEntry[OntCoordinator]
 
 
@@ -46,17 +50,24 @@ class OntCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self.client = client
         self.device_info = device_info
         self._last_sample: tuple[float, int, int] | None = None
+        self._slow_data: dict[str, Any] = {}
+        self._slow_updated: float | None = None
 
     async def _async_update_data(self) -> dict[str, Any]:
         try:
             data = await self.client.get_data()
+            now = time.monotonic()
+            if self._slow_updated is None or now - self._slow_updated >= SLOW_UPDATE_INTERVAL:
+                self._slow_data = await self.client.get_slow_data()
+                self._slow_updated = now
         except OntAuthError as err:
             raise ConfigEntryAuthFailed(str(err)) from err
         except OntError as err:
             raise UpdateFailed(str(err)) from err
 
+        data.update(self._slow_data)
+
         # Derive throughput from the GEM byte counters
-        now = time.monotonic()
         up, down = data["upstream_bytes"], data["downstream_bytes"]
         data["upstream_throughput"] = data["downstream_throughput"] = None
         if self._last_sample is not None:
