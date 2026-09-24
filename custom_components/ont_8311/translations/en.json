@@ -1,0 +1,96 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to 8311 ONT",
+        "description": "Enter the address and LuCI login of an ONT running the 8311 community firmware (WAS-110, PRX126 and similar XGS-PON sticks).",
+        "data": {
+          "host": "Host",
+          "username": "Username",
+          "password": "Password",
+          "verify_ssl": "Verify SSL certificate"
+        },
+        "data_description": {
+          "host": "IP address or hostname of the ONT, usually 192.168.11.1.",
+          "username": "LuCI username, usually root.",
+          "password": "LuCI password. Leave blank if none is set.",
+          "verify_ssl": "The ONT uses a self-signed certificate by default, so leave this off unless you installed a trusted one."
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure 8311 ONT",
+        "data": {
+          "host": "Host",
+          "username": "Username",
+          "password": "Password",
+          "verify_ssl": "Verify SSL certificate"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate 8311 ONT",
+        "description": "The ONT rejected the stored credentials.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect. Check the host and that Home Assistant can route to the ONT.",
+      "invalid_auth": "Invalid username or password.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This ONT is already configured.",
+      "reauth_successful": "Re-authentication was successful.",
+      "reconfigure_successful": "Reconfiguration was successful.",
+      "unique_id_mismatch": "This is a different ONT than the one originally configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "8311 ONT options",
+        "data": {
+          "scan_interval": "Update interval (seconds)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "pon_link": { "name": "PON link" },
+      "alarm": { "name": "Alarm" },
+      "receiver_problem": { "name": "Optical receiver" }
+    },
+    "sensor": {
+      "rx_power": { "name": "RX power" },
+      "tx_power": { "name": "TX power" },
+      "tx_bias": { "name": "TX bias current" },
+      "voltage": { "name": "Supply voltage" },
+      "optic_temperature": { "name": "Optic temperature" },
+      "cpu1_temperature": { "name": "CPU 1 temperature" },
+      "cpu2_temperature": { "name": "CPU 2 temperature" },
+      "ploam_state": { "name": "PLOAM state" },
+      "pon_mode": { "name": "PON mode" },
+      "eth_speed": { "name": "Ethernet link speed" },
+      "active_bank": { "name": "Active firmware bank" },
+      "downstream_throughput": { "name": "Downstream throughput" },
+      "upstream_throughput": { "name": "Upstream throughput" },
+      "downstream_bytes": { "name": "Downstream data" },
+      "upstream_bytes": { "name": "Upstream data" },
+      "bip_errors": { "name": "BIP errors" },
+      "fec_codewords_corrected": { "name": "FEC corrected codewords" },
+      "fec_codewords_uncorrected": { "name": "FEC uncorrected codewords" },
+      "fec_errored_seconds": { "name": "FEC errored seconds" },
+      "psbd_hec_errors_uncorrected": { "name": "PSBd HEC uncorrected errors" },
+      "fs_hec_errors_uncorrected": { "name": "FS HEC uncorrected errors" },
+      "hec_lost_words": { "name": "HEC lost words" },
+      "ploam_mic_errors": { "name": "PLOAM MIC errors" },
+      "boot_time": { "name": "Last boot" },
+      "memory_usage": { "name": "Memory usage" },
+      "load_1m": { "name": "Load (1m)" },
+      "load_5m": { "name": "Load (5m)" }
+    }
+  }
+}

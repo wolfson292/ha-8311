@@ -1,0 +1,24 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "pon_link": { "default": "mdi:wan" },
+      "receiver_problem": { "default": "mdi:eye-check", "state": { "on": "mdi:eye-off" } }
+    },
+    "sensor": {
+      "ploam_state": { "default": "mdi:state-machine" },
+      "pon_mode": { "default": "mdi:fiber" },
+      "active_bank": { "default": "mdi:chip" },
+      "downstream_throughput": { "default": "mdi:download-network" },
+      "upstream_throughput": { "default": "mdi:upload-network" },
+      "downstream_bytes": { "default": "mdi:download" },
+      "upstream_bytes": { "default": "mdi:upload" },
+      "bip_errors": { "default": "mdi:alert-circle-outline" },
+      "fec_codewords_corrected": { "default": "mdi:check-decagram-outline" },
+      "fec_codewords_uncorrected": { "default": "mdi:alert-decagram-outline" },
+      "fec_errored_seconds": { "default": "mdi:timer-alert-outline" },
+      "memory_usage": { "default": "mdi:memory" },
+      "load_1m": { "default": "mdi:gauge" },
+      "load_5m": { "default": "mdi:gauge" }
+    }
+  }
+}

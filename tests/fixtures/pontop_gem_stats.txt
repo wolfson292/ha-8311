@@ -1,0 +1,4 @@
+Page: GEM/XGEM Port Counters
+GEM Index       GEM ID          u/s packets     u/s bytes       d/s packets     d/s bytes       Key Errors     
+0               40              9058            434784          7976            382704          0              
+1               2306            2870274868      1386677384803   3234003824      3381308732969   0              
